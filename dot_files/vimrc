@@ -1,0 +1,462 @@
+" ########## PLUGINS ##########
+
+" Start/Install vim-plug
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+call plug#begin('~/.vim/plugged')
+
+" Plugins
+Plug 'morhetz/gruvbox' " Gruvbox Theme
+Plug 'ConradIrwin/vim-bracketed-paste' " Bracketed paste (no more :set paste)
+Plug 'rhysd/vim-gfm-syntax' " GitHub Markdown syntax
+" Plug 'jeffkreeftmeijer/vim-numbertoggle' " Automatic number toggle
+Plug 'sheerun/vim-polyglot' " Multi-language syntax
+Plug 'jvirtanen/vim-hcl' " HCL syntax
+Plug 'tpope/vim-repeat' " Improved . repetition
+Plug 'tpope/vim-surround' " Easy manipulation of surroundings
+Plug 'jiangmiao/auto-pairs' " Automatic surroundings
+Plug 'tpope/vim-commentary' " Easy manipulation of commentaries
+Plug 'ycm-core/YouCompleteMe' " Auto completion
+Plug 'SirVer/ultisnips' " The ultimate solution for snippets in Vim
+Plug 'honza/vim-snippets' " Load default snippets
+Plug 'ervandew/supertab' " https://stackoverflow.com/questions/14896327/ultisnips-and-youcompleteme
+Plug 'tpope/vim-fugitive' " Git integration
+Plug 'tommcdo/vim-fubitive' " Bitbucket browse for fugitive
+Plug 'tpope/vim-rhubarb' " Github browse for fugitive
+Plug 'shumphrey/fugitive-gitlab.vim' " Gitlab browse for fugitive
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " FZF
+Plug 'junegunn/fzf.vim' " FZF vim
+Plug 'airblade/vim-rooter' " Change workdir to project dir when opening file
+" Plug 'preservim/tagbar' " Open a tab with all the Tags in that file
+Plug 'vim-airline/vim-airline' " Airline
+Plug 'vim-airline/vim-airline-themes' " Airline themes
+Plug 'preservim/nerdtree'
+" Plug 'PhilRunninger/nerdtree-buffer-ops'
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+Plug 'ryanoasis/vim-devicons'
+Plug 'skywind3000/asyncrun.vim'
+Plug 'adiffpirate/vim-llm'
+call plug#end()
+
+" Disable preview panel from YouCompleteMe
+let g:ycm_add_preview_to_completeopt = 0
+set completeopt-=preview
+" Make YCM compatible with UltiSnips (using supertab)
+let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+let g:SuperTabDefaultCompletionType = '<C-n>'
+
+" Whitelist airline extensions to improve performance
+" (https://github.com/vim-airline/vim-airline/issues/421)
+" let g:airline_extensions = ['tagbar']
+let g:airline_skip_empty_sections = 1
+let g:airline_section_b = ''
+let g:airline_section_x = ''
+" let g:airline_section_y = '%#__accent_bold#%#__restore__#%{airline#util#prepend("",0)}%{airline#util#prepend(airline#extensions#tagbar#currenttag(),0)}%{airline#util#prepend("",0)}%{airline#util#prepend("",0)}%{airline#util#prepend("",0)}%{airline#util#prepend("",0)}%{airline#util#wrap(airline#parts#filetype(),0)}'
+let g:airline_section_y = '%#__accent_bold#%#__restore__#%{airline#util#prepend("",0)}%{airline#util#prepend("",0)}%{airline#util#prepend("",0)}%{airline#util#prepend("",0)}%{airline#util#prepend("",0)}%{airline#util#wrap(airline#parts#filetype(),0)}'
+let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
+" let g:airline#extensions#tabline#enabled = 1
+" Smartly uniquify buffers names with similar filename, suppressing common parts of paths.
+" let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+let g:airline_powerline_fonts = 1
+let g:airline_highlighting_cache = 1
+let g:airline_exclude_preview = 1
+let g:webdevicons_enable_airline_statusline = 0
+let g:airline_theme='base16_gruvbox_dark_medium'
+" Hide -- Insert -- (airline already shows us)
+set noshowmode
+
+" Disable statusline on FZF window
+autocmd! FileType fzf
+autocmd  FileType fzf set laststatus=0 noshowmode noruler
+  \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+" [Tags] Command to generate tags file
+" let g:fzf_tags_command = 'ctags -R'
+
+" Open tagbar window on the left to 33 percent of the window width
+" with a limit of no less than 25 characters.
+" let g:tagbar_position = 'leftabove vertical'
+" let g:tagbar_width = max([25, winwidth(0) / 3])
+" autocmd VimEnter * nested :TagbarOpen
+" Show absolute line numbers
+" let g:tagbar_show_linenumbers = 2
+
+" Makes Rooter start in manual mode (use :RooterToggle)
+let g:rooter_manual_only = 1
+
+" If the screen if big enough starts NERDTree and puts the cursor back in the other window.
+autocmd VimEnter * if winwidth(0) >= 170 | NERDTreeVCS | wincmd p
+" Exit Vim if NERDTree is the only window remaining in the only tab.
+" (the sulent execute is to reset the cursos shape before leaving)
+autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | silent execute '!echo -ne "\e[0 q"' | quit | endif
+" If another buffer tries to replace NERDTree, put it in the other window, and bring back NERDTree.
+autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_tree_\d\+' && winnr('$') > 1 |
+    \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif
+" Open the existing NERDTree on each new tab.
+autocmd BufWinEnter * if getcmdwintype() == '' | silent NERDTreeMirror | endif
+" Use NerdFonts for git symbols
+let g:NERDTreeGitStatusUseNerdFonts = 1
+let g:NERDTreeGitStatusIndicatorMapCustom = {
+  \ 'Modified'  :'!',
+  \ 'Staged'    :'✚',
+  \ 'Untracked' :'✭',
+  \ 'Renamed'   :'➜',
+  \ 'Unmerged'  :'═',
+  \ 'Deleted'   :'✗',
+  \ 'Dirty'     :'!',
+  \ 'Ignored'   :'☒',
+  \ 'Clean'     :'✔︎',
+  \ 'Unknown'   :'?',
+  \ }
+" Open dirs on single click and files on double click
+let g:NERDTreeMouseMode = 2
+" Hide NERDTree StatusLine
+let g:NERDTreeStatusline = ""
+" Remove bookmarks and help text from NERDTree
+let g:NERDTreeMinimalUI = 1
+" Open NERDTree window on the left to 33 percent of the window width
+" with a limit of no less than 25 characters.
+let g:NERDTreeWinPos = 'left'
+let g:NERDTreeWinSize = max([25, winwidth(0) / 3])
+" Recursively open directories that have only one child which is also a directory.
+" NERDTree will stop when it finds a directory that contains anything but another single directory.
+" This setting also causes the |NERDTree-x| mapping to close directories in the same manner.
+let NERDTreeCascadeSingleChildDir=1
+let NERDTreeCascadeOpenSingleChildDir=1
+" Automatically remove a buffer when a file is being deleted or renamed via a context menu command.
+let NERDTreeAutoDeleteBuffer=1
+" Check if NERDTree is open or active
+function! IsNERDTreeOpen()
+  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
+endfunction
+" Call NERDTreeFind if NERDTree is active, current window contains a modifiable
+" file, and we're not in vimdiff
+function! SyncTree()
+  if &modifiable && IsNERDTreeOpen() && strlen(expand('%')) > 0 && !&diff
+    NERDTreeFind
+    wincmd p
+  endif
+endfunction
+" Highlight currently open buffer in NERDTree
+autocmd BufEnter * call SyncTree()
+autocmd VimEnter * call SyncTree()
+" Syntax highlighting colors
+let s:brown = "905532"
+let s:aqua =  "3AFFDB"
+let s:blue = "689FB6"
+let s:darkBlue = "44788E"
+let s:purple = "8F3F71"
+let s:lightPurple = "834F79"
+let s:red = "AE403F"
+let s:beige = "F5C06F"
+let s:yellow = "F09F17"
+let s:orange = "D4843E"
+let s:darkOrange = "F16529"
+let s:pink = "CB6F6F"
+let s:salmon = "EE6E73"
+let s:green = "989A1F"
+let s:lightGreen = "31B53E"
+let s:white = "7A7A7A"
+let s:rspec_red = 'FE405F'
+let s:git_orange = 'F54D27'
+" Limit extensions to improve performance
+let g:NERDTreeSyntaxDisableDefaultExtensions = 1
+let g:NERDTreeSyntaxDisableDefaultExactMatches = 1
+let g:NERDTreeSyntaxDisableDefaultPatternMatches = 1
+let g:NERDTreeSyntaxEnabledExtensions = []
+let g:NERDTreeSyntaxEnabledExactMatches = []
+" Customize by file extension
+let g:NERDTreeExtensionHighlightColor = {} " this line is needed to avoid error
+let g:NERDTreeExtensionHighlightColor['tf'] = s:purple
+let g:NERDTreeExtensionHighlightColor['yaml'] = s:salmon
+" Customize by pattern
+let g:NERDTreePatternMatchHighlightColor = {} " this line is needed to avoid error
+let g:NERDTreePatternMatchHighlightColor['.*docker.*\.yml$'] = s:blue
+let g:NERDTreePatternMatchHighlightColor['.*Dockerfile.*'] = s:blue
+" Enables folder icon highlighting using exact match
+let g:NERDTreeHighlightFolders = 1
+" Highlights the folder name
+let g:NERDTreeHighlightFoldersFullName = 1
+" Highlight full name (not only icons)
+let g:NERDTreeFileExtensionHighlightFullName = 1
+let g:NERDTreeExactMatchHighlightFullName = 1
+let g:NERDTreePatternMatchHighlightFullName = 1
+let g:DevIconsEnableFolderPatternMatching = 1
+" Show files above directories
+let g:NERDTreeSortOrder = ['*', '\/$']
+" Hide the slashes after each directory node
+augroup nerdtreehideslash
+  autocmd!
+  autocmd FileType nerdtree setlocal conceallevel=3 | syntax match NERDTreeDirSlash #/$# containedin=NERDTreeDir conceal contained
+augroup end
+" Hide the path line at the first line of NERDTree
+augroup nerdtreehidecwd
+  autocmd!
+  autocmd FileType nerdtree setlocal conceallevel=3
+    \ | syntax match NERDTreeHideCWD #^[</].*$# conceal
+    \ | setlocal concealcursor=n
+augroup end
+" Show hidden files by default
+let NERDTreeShowHidden=0
+" Auto-refresh NERDTree on file write or buffer/split change
+" - Refreshes the NERDTree view using `normal R`
+" - If not currently in NERDTree, briefly focuses, refreshes, and returns
+" - If already in NERDTree, just refreshes and stays
+" - Skips execution if NERDTree hasn't been opened yet (avoids E121)
+augroup NERDTreeAutoRefresh
+  autocmd!
+  autocmd BufWritePost,BufEnter,WinEnter * if eval("exists('t:NERDTreeBufName')") && bufname() !=# t:NERDTreeBufName |
+        \   NERDTreeFocus |
+        \   silent execute 'normal R' |
+        \   wincmd p |
+        \ elseif eval("exists('t:NERDTreeBufName')") && bufname() ==# t:NERDTreeBufName |
+        \   silent execute 'normal R' |
+        \ endif
+augroup END
+
+" enable folder/directory glyph flag (disabled by default with 0)
+let g:WebDevIconsUnicodeDecorateFolderNodes = 1
+" enable open and close folder/directory glyph flags (disabled by default with 0)
+let g:DevIconsEnableFoldersOpenClose = 1
+" Sets the color for folders that did not match any rule
+let g:WebDevIconsDefaultFolderSymbolColor = s:green
+" Sets the color for files that did not match any rule
+let g:WebDevIconsDefaultFileSymbolColor = s:white
+" Enable pattern matching glyphs on folder/directory
+let g:DevIconsEnableFolderPatternMatching = 1
+" Enable file extension pattern matching glyphs on folder/directory
+let g:DevIconsEnableFolderExtensionPatternMatching = 0
+
+" AsyncRun
+let g:airline_section_warning = airline#section#create_right(['%{g:asyncrun_status == "running" ? "running cmd" : ""}'])
+
+" LLM
+let g:llm_model = 'qwen2.5-coder:14b'
+
+" ########## MISC CONFIGS ##########
+
+" Set enconding
+set encoding=UTF-8
+
+" Set colorscheme
+colorscheme gruvbox
+set bg=dark
+set termguicolors
+
+" Transparent background
+hi Normal guibg=NONE ctermbg=NONE
+
+" Show existing tab with 2 spaces width
+set tabstop=2
+" When indenting with '>', use 2 spaces width
+set shiftwidth=2
+
+" Smartcase
+set ignorecase
+set smartcase
+
+" Disable line wrapping
+set nowrap
+
+" Set line numbers
+set number
+set cursorline
+" set nuw=5
+
+" Highlight column 81 on insert mode when text surpass it
+autocmd InsertEnter * call matchadd('ColorColumn', '\%81v', 100, 10)
+autocmd InsertLeave * call matchdelete(10)
+
+" Dynamic cursor shape
+autocmd VimEnter * silent execute '!echo -ne "\e[2 q"' | redraw!
+autocmd BufLeave * silent execute '!echo -ne "\e[2 q"'
+let &t_SI = "\<Esc>[5 q"
+let &t_SR = "\<Esc>[2 q"
+let &t_EI = "\<Esc>[2 q"
+autocmd VimLeave * silent execute '!echo -ne "\e[0 q"'
+
+" Open a vertical split by default
+" autocmd VimEnter * vsplit
+
+" Enable mouse support
+set ttymouse=sgr
+set mouse=a
+
+" Change split separator char
+set fillchars+=vert:\│
+
+" Enable autosave
+set autowrite
+set autowriteall
+
+" Enable autoread
+set autoread
+if ! exists("g:CheckUpdateStarted")
+    let g:CheckUpdateStarted=1
+    call timer_start(1,'CheckUpdate')
+endif
+function! CheckUpdate(timer)
+    silent! checktime
+    call timer_start(1000,'CheckUpdate')
+endfunction
+
+" https://superuser.com/a/1557751
+set clipboard+=unnamedplus
+let g:clipboard = {
+  \   'name': 'win32yank-wsl',
+  \   'copy': {
+  \      '+': 'win32yank.exe -i --crlf',
+  \      '*': 'win32yank.exe -i --crlf',
+  \    },
+  \   'paste': {
+  \      '+': 'win32yank.exe -o --lf',
+  \      '*': 'win32yank.exe -o --lf',
+  \   },
+  \   'cache_enabled': 0,
+  \ }
+
+" ########## MAPPINGS ##########
+
+" Lower timeout waiting for key
+set timeoutlen=500
+
+" Set leader key to <Space>
+nnoremap <SPACE> <Nop>
+let mapleader = " "
+
+" Allow to use macro in normal and insert mode with F2
+nnoremap <F2> @
+inoremap <F2> <Esc>@
+
+" Toggle line wrapper with F3
+nnoremap <F3> :set wrap! <CR>
+inoremap <F3> <Esc>:set wrap! <CR>i
+
+" Toggle line numbers with F4
+nnoremap <F4> :set number! <CR>
+inoremap <F4> <Esc>:set number! <CR>i
+
+" Buffers navigation
+set hidden
+nnoremap <Leader>1 :b1<CR>
+nnoremap <Leader>2 :b2<CR>
+nnoremap <Leader>3 :b3<CR>
+nnoremap <Leader>4 :b4<CR>
+nnoremap <Leader>5 :b5<CR>
+nnoremap <Leader>6 :b6<CR>
+nnoremap <Leader>7 :b7<CR>
+nnoremap <Leader>8 :b8<CR>
+nnoremap <Leader>9 :b9<CR>
+nnoremap <Leader>' :b#<CR>
+
+" https://stackoverflow.com/questions/4298910/vim-close-buffer-but-not-split-window
+" nmap <Leader>q :b#<bar>bd#<CR>
+
+" Open horizontal split
+nnoremap <Leader>_ <C-w>s<C-w>j<C-w>k
+" Open vertical split
+nnoremap <Leader>\| <C-w>v<C-w>l<C-w>h
+" Close split
+nnoremap <Leader>q <C-w>q
+" Split navigation
+nnoremap <Leader>h <C-w>h
+nnoremap <Leader>j <C-w>j
+nnoremap <Leader>k <C-w>k
+nnoremap <Leader>l <C-w>l
+" Go to last split with <Leader><Tab>
+nnoremap <Leader><Tab> <C-w><C-p>
+vnoremap <Leader><Tab> <C-w><C-p>
+
+" NerdTree
+nnoremap <Leader>nt :NERDTreeFocus<CR>
+
+" FZF
+nnoremap <Leader>s :Tags <C-r><C-w><CR>
+vnoremap <Leader>s y:Tags <C-r>=escape(@", '+=-')<CR><CR>
+nnoremap <Leader>t :Tags<CR>
+nnoremap <Leader>ct :BTags<CR>
+nnoremap <Leader>m :Marks<CR>
+nnoremap <Leader>b :Buffers<CR>
+nnoremap <Leader>f :Files<CR>
+nnoremap <Leader>gf :GFiles<CR>
+nnoremap <Leader>r :Rg<CR>
+nnoremap <Leader>* :Rg <C-r><C-w><CR>
+vnoremap <Leader>* y:Rg <C-r>=escape(@", '+=-')<CR><CR>
+nnoremap <Leader>glog :Commits<CR>
+nnoremap <Leader>cglg :BCommits<CR>
+nnoremap <Leader>gst :GFiles?<CR>
+
+" Fugitive
+nnoremap <Leader>g :G
+nnoremap <Leader>gst :G status<CR>
+nnoremap <Leader>glg :G log<CR>
+nnoremap <Leader>glgm :G log<CR>jjjjyy:bd<CR>p<<<<<<kdd
+nnoremap <Leader>gc :G commit -v<CR>
+nnoremap <Leader>gca :G commit -a -v<CR>
+nnoremap <Leader>ga :G add<Space>
+nnoremap <Leader>gaa :G add --all<CR>
+nnoremap <Leader>gp :!git push<CR>
+nnoremap <Leader>gl :!git pull<CR>
+nnoremap <Leader>gs :Gsplit origin/:%<Left><Left>
+nnoremap <Leader>gsd :Gsplit origin/develop:%<CR>
+nnoremap <Leader>gsm :Gsplit origin/master:%<CR>
+nnoremap <Leader>grb :Git fetch --all<CR>:Git rebase origin/
+nnoremap <Leader>grbm :Git fetch --all<CR>:Git rebase origin/master<CR>
+
+" Keep cursor in the middle all the time :)
+nnoremap j jzz
+vnoremap j jzz
+nnoremap k kzz
+vnoremap k kzz
+nnoremap <CR> <CR>zz
+vnoremap <CR> <CR>zz
+inoremap <CR> <Esc>zza<CR>
+nnoremap G Gzz
+vnoremap G Gzz
+nnoremap gg ggzz
+vnoremap gg ggzz
+nnoremap } }zz
+vnoremap } }zz
+nnoremap { {zz
+vnoremap { {zz
+nnoremap n nzz
+vnoremap n nzz
+nnoremap N Nzz
+vnoremap N Nzz
+  " Also swap ' and `
+nnoremap <nowait> <expr> ' "`" . nr2char(getchar()) . "zz"
+vnoremap <nowait> <expr> ' "`" . nr2char(getchar()) . "zz"
+nnoremap <nowait> <expr> ` "'" . nr2char(getchar()) . "zz"
+vnoremap <nowait> <expr> ` "'" . nr2char(getchar()) . "zz"
+
+" Insert one backstick instead of two
+inoremap `` `
+
+"" Integration with Windows Clipboard
+""   Copy the whole file
+"nnoremap <Leader>y :!cat % \| clip.exe<CR><CR>
+""   On visual mode copy selected
+"vnoremap <silent> <Leader>y :w !clip.exe<CR><CR>
+""   Copy current line
+"nnoremap <silent> <Leader>yy <S-v>:w !clip.exe<CR><CR>
+""   On visual mode copy and delete selected
+"noremap gV `[v`]
+"vnoremap <silent> <Leader>d mm:w !clip.exe<CR><CR>gvd
+""   Copy and delete current line
+"nnoremap <silent> <Leader>dd <S-v>:w !clip.exe<CR><CR>dd
+""   Pasting
+"nnoremap <silent> <Leader>p :call append(line('.'), system('win32yank.exe -o'))<CR>
+
+nnoremap <Leader>y "+y
+vnoremap <Leader>y "+y
+nnoremap <Leader>p "+p
+vnoremap <Leader>p "+p
+" Close and save with Ctrl+D
+nnoremap <C-d> :wq<CR>
+
+" AI
+nnoremap <Leader>ai :LLMEdit ''<Left>
