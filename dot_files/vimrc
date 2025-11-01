@@ -235,7 +235,7 @@ let g:DevIconsEnableFolderExtensionPatternMatching = 0
 let g:airline_section_warning = airline#section#create_right(['%{g:asyncrun_status == "running" ? "running cmd" : ""}'])
 
 " LLM
-let g:llm_model = 'qwen2.5-coder:14b'
+let g:llm_model = 'gpt-oss:20b'
 
 " ########## MISC CONFIGS ##########
 

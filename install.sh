@@ -162,6 +162,8 @@ if ! which -s llm; then
     echo "Installing LLM"
     pipx install llm
     pipx install files-to-prompt
+    pipx install mdrender
+    pipx install token-count
     $HOME/.local/bin/llm install llm-ollama
     $HOME/.local/bin/llm install llm-cmd
     $HOME/.local/bin/llm install llm-cmd-comp
