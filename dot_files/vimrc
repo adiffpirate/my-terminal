@@ -236,6 +236,7 @@ let g:airline_section_warning = airline#section#create_right(['%{g:asyncrun_stat
 
 " LLM
 let g:llm_model = 'gpt-oss:20b'
+" let g:llm_model = 'gemma3:4b'
 
 " ########## MISC CONFIGS ##########
 
@@ -460,3 +461,4 @@ nnoremap <C-d> :wq<CR>
 
 " AI
 nnoremap <Leader>ai :LLMEdit ''<Left>
+vnoremap <Leader>ai :LLMEdit ''<Left>
