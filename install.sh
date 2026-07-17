@@ -137,6 +137,7 @@ sudo dpkg -i /tmp/git-delta.deb 2>/dev/null || sudo apt-get -f install -y   # fi
 
 git config --global user.name adiffpirate
 git config --global user.email adiffpirate@gmail.com
+git config --global credential.username adiffpirate
 git config --global core.pager delta
 git config --global interactive.diffFilter 'delta --color-only'
 git config --global delta.navigate true
