@@ -43,7 +43,7 @@ touch "$HOME/.workprofile.zshrc"
 # -------------------------------------------------------------------
 echo "Installing basic tools"
 sudo apt-get update -y
-sudo apt-get install -y curl wget jq eza vim-gtk3 xkcdpass python3-pip pipx
+sudo apt-get install -y htop curl wget jq eza vim-gtk3 xkcdpass python3-pip pipx
 
 if ! command -v yq &>/dev/null; then
     download_and_install_binary yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
